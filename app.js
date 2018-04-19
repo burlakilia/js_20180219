@@ -531,6 +531,8 @@ var _chat = __webpack_require__(3);
 
 var _message = __webpack_require__(1);
 
+var _utils = __webpack_require__(9);
+
 window.addEventListener('DOMContentLoaded', function () {
     console.log(_auth.Auth);
 
@@ -541,6 +543,18 @@ window.addEventListener('DOMContentLoaded', function () {
     window.chat = chat;
     window.message = message;
     window.auth = auth;
+
+    console.log(1 + 1 + ' test');
+
+    var list = void 0;
+
+    (0, _utils.request)('get', '/data/data.json').then(function (data) {
+        return (0, _utils.request)('get', '/data/' + data[0].user + '.json');
+    }, function (err) {
+        return console.log(err);
+    });
+
+    // consooe.log(ilia, elina); // оба были выведены
 });
 
 //
@@ -588,6 +602,42 @@ module.exports = template;
 /***/ (function(module, exports) {
 
 /* (ignored) */
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.request = request;
+function request(method, path, done) {
+    var xhr = new XMLHttpRequest();
+
+    return new Promise(function (resolve, reject) {
+
+        xhr.addEventListener('readystatechange', function (_ref) {
+            var target = _ref.target;
+
+
+            if (target.readyState === 4 && target.status === 200) {
+                resolve(JSON.parse(target.responseText));
+            }
+
+            if (target.readyState === 4 && target.status > 299) {
+                reject(target.status);
+            }
+        });
+
+        xhr.open(method.toUpperCase(), path);
+        xhr.send();
+    });
+}
+
+// request('GET', '/data.json', (data) => { console.log(data) })
 
 /***/ })
 /******/ ]);
