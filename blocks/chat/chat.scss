@@ -1,16 +1,20 @@
 .chat {
-    width: 300px;
+    width: 900px;
     margin: auto;
-    bakground-color: #19ff19;
+    background-color: #ffffff;
     color: #fff;
-    font-size: 14px;
-
-    &__title {
-        font-size: 16px;
-    }
+    font-size: 16px;
 
     &__message {
-        color: #4d4;
+        color: #1a1cdd;
     }
 
+    &__name {
+        margin-right: 5px;
+        color: crimson;
+    }
+
+    &__chat-hide {
+        display: none;
+    }
 }

@@ -14,3 +14,8 @@ h1{
     color: #00008b;
     text-align: center;
 }
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+}

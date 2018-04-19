@@ -10,9 +10,14 @@ export class Chat {
 
     }
 
-    render() {
-        console.log(2143);
-        this.el.innerHTML = template();
+    render(text = '') {
+        this.el.innerHTML += template({
+            text
+        });
+    }
+
+    insertMessage(text) {
+        this.render(text)
     }
 
 }
