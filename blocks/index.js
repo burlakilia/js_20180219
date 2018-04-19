@@ -8,6 +8,10 @@ window.addEventListener('DOMContentLoaded', () => {
     let auth = new Auth(document.querySelector('.js-auth'), {});
     let chat = new Chat(document.querySelector('.js-chat'), {});
     let message = new Message(document.querySelector('.js-message'), {});
+
+    window.chat = chat;
+    window.message = message;
+    window.auth = auth;
 });
 
 
