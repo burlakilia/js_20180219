@@ -1,11 +1,31 @@
 import {View} from '../view';
 import {Chat} from "../../blocks/chat/chat";
+import {Message} from '../../blocks/message/message';
+import {User} from '../../models/user';
+
 
 export class ChatView extends View {
 
     constructor(el) {
         super(el);
-        this.chat = new Chat(this.el, {});
+
+        this.user = User.get();
+
+        if (!this.user) {
+            location.hash = '#login';
+            return;
+        }
+
+        this.chat = new Chat(document.createElement('div'), {});
+        this.message = new Message(document.createElement('div'));
+
+        this.el.appendChild(this.chat.el);
+        this.el.appendChild(this.message.el);
+
+        this.message.insertMessage = (text) => {
+            this.chat.insertMessage(text);
+        };
+
     }
 
 }

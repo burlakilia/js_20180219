@@ -431,6 +431,8 @@ var _view = __webpack_require__(1);
 
 var _auth = __webpack_require__(5);
 
+var _user = __webpack_require__(13);
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -446,6 +448,17 @@ var AuthView = exports.AuthView = function (_View) {
         var _this = _possibleConstructorReturn(this, (AuthView.__proto__ || Object.getPrototypeOf(AuthView)).call(this, el));
 
         _this.auth = new _auth.Auth(_this.el, {});
+
+        _this.auth.onLogin = function (name, pwd) {
+
+            if (name && pwd) {
+                var model = new _user.User(name, pwd);
+                model.save();
+                location.hash = '#chat';
+            } else {
+                console.log('Authorization failed');
+            }
+        };
         return _this;
     }
 
@@ -468,6 +481,10 @@ var _view = __webpack_require__(1);
 
 var _chat = __webpack_require__(6);
 
+var _message = __webpack_require__(8);
+
+var _user = __webpack_require__(13);
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -482,7 +499,23 @@ var ChatView = exports.ChatView = function (_View) {
 
         var _this = _possibleConstructorReturn(this, (ChatView.__proto__ || Object.getPrototypeOf(ChatView)).call(this, el));
 
-        _this.chat = new _chat.Chat(_this.el, {});
+        _this.user = _user.User.get();
+
+        if (!_this.user) {
+            location.hash = '#login';
+            return _possibleConstructorReturn(_this);
+        }
+
+        _this.chat = new _chat.Chat(document.createElement('div'), {});
+        _this.message = new _message.Message(document.createElement('div'));
+
+        _this.el.appendChild(_this.chat.el);
+        _this.el.appendChild(_this.message.el);
+
+        _this.message.insertMessage = function (text) {
+            _this.chat.insertMessage(text);
+        };
+
         return _this;
     }
 
@@ -529,27 +562,21 @@ var Auth = exports.Auth = function () {
 
             var name = _this.el.querySelector('.auth__name').value.slice();
             var password = _this.el.querySelector('.auth__password').value.slice();
-
             var authenticated = name && password;
 
-            if (authenticated) {
-                console.log('Hi, ' + name);
-                localStorage.setItem('authenticated', true);
-
-                // тапорненько перерисовываем.
-                window.chat.render();
-                window.message.render();
-                _this.render();
-
-                // запишем в виндоу юзера тоже думаю временно
-                localStorage.setItem('user', name);
-            } else {
-                console.log('Authorization failed');
-            }
+            _this.onLogin(name, password);
         });
     }
 
+    /**
+     * @override
+     */
+
+
     _createClass(Auth, [{
+        key: 'onLogin',
+        value: function onLogin() {}
+    }, {
         key: 'render',
         value: function render() {
             this.el.innerHTML = (0, _auth2.default)();
@@ -703,9 +730,19 @@ var Message = exports.Message = function () {
         key: 'sendMessage',
         value: function sendMessage() {
             var input = this.el.querySelector('.message__input');
-            window.chat.insertMessage(input.value);
+            this.insertMessage(input.value);
             input.value = '';
         }
+
+        /**
+         * Добавляение сообщения
+         * @override
+         * @param text
+         */
+
+    }, {
+        key: 'insertMessage',
+        value: function insertMessage(text) {}
     }]);
 
     return Message;
@@ -726,9 +763,7 @@ module.exports = template;
 
 var pug = __webpack_require__(0);
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (text, user) {if (text) {
-pug_html = pug_html + "\u003Cdiv class=\"chat pure-u-1-2\"\u003E\u003Cspan class=\"chat__name\"\u003E" + (pug.escape(null == (pug_interp = user) ? "" : pug_interp)) + "\u003C\u002Fspan\u003E\u003Cspan class=\"chat__message\"\u003E" + (pug.escape(null == (pug_interp = text) ? "" : pug_interp)) + "\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E";
-}}.call(this,"text" in locals_for_with?locals_for_with.text:typeof text!=="undefined"?text:undefined,"user" in locals_for_with?locals_for_with.user:typeof user!=="undefined"?user:undefined));;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (text, user) {pug_html = pug_html + "\u003Cdiv class=\"chat-container\"\u003E\u003Cdiv class=\"chat pure-u-1-2\"\u003E\u003Cspan class=\"chat__name\"\u003E" + (pug.escape(null == (pug_interp = user) ? "" : pug_interp)) + "\u003C\u002Fspan\u003E\u003Cspan class=\"chat__message\"\u003E" + (pug.escape(null == (pug_interp = text) ? "" : pug_interp)) + "\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";}.call(this,"text" in locals_for_with?locals_for_with.text:typeof text!=="undefined"?text:undefined,"user" in locals_for_with?locals_for_with.user:typeof user!=="undefined"?user:undefined));;return pug_html;};
 module.exports = template;
 
 /***/ }),
@@ -737,8 +772,7 @@ module.exports = template;
 
 var pug = __webpack_require__(0);
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (localStorage) {const authenticated = localStorage.getItem('authenticated');
-pug_html = pug_html + "\u003Cform" + (pug.attr("class", pug.classes(["message","pure-form",!authenticated ? 'message__message-hide' : ''], [false,false,true]), false, true)) + "\u003E\u003Ctextarea class=\"message__input pure-input-1-2\" placeholder=\"Add your message here...\"\u003E\u003C\u002Ftextarea\u003E\u003Cbutton class=\"message__button button-success pure-button\"\u003ESend\u003C\u002Fbutton\u003E\u003C\u002Fform\u003E";}.call(this,"localStorage" in locals_for_with?locals_for_with.localStorage:typeof localStorage!=="undefined"?localStorage:undefined));;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cform class=\"message pure-form\"\u003E\u003Ctextarea class=\"message__input pure-input-1-2\" placeholder=\"Add your message here...\"\u003E\u003C\u002Ftextarea\u003E\u003Cbutton class=\"message__button button-success pure-button\"\u003ESend\u003C\u002Fbutton\u003E\u003C\u002Fform\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),
@@ -746,6 +780,51 @@ module.exports = template;
 /***/ (function(module, exports) {
 
 /* (ignored) */
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var KEY = 'user';
+
+var User = exports.User = function () {
+    function User(name) {
+        _classCallCheck(this, User);
+
+        this.name = name;
+    }
+
+    _createClass(User, [{
+        key: 'save',
+        value: function save() {
+            localStorage.setItem(KEY, this.name);
+        }
+    }], [{
+        key: 'get',
+        value: function get() {
+            var name = localStorage.getItem(KEY);
+
+            if (name) {
+                return new User(name);
+            }
+
+            return null;
+        }
+    }]);
+
+    return User;
+}();
 
 /***/ })
 /******/ ]);

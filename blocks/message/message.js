@@ -6,7 +6,6 @@ export class Message {
         this.el = el;
         this.data = data;
         this.render();
-
      }
 
     render() {
@@ -34,9 +33,16 @@ export class Message {
 
     sendMessage() {
         const input = this.el.querySelector('.message__input');
-        window.chat.insertMessage(input.value);
+        this.insertMessage(input.value);
         input.value = '';
     }
+
+    /**
+     * Добавляение сообщения
+     * @override
+     * @param text
+     */
+    insertMessage(text) {}
 
 }
 
