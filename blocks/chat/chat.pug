@@ -1,6 +1,4 @@
-- const authenticated = localStorage.getItem('authenticated');
-- const user = localStorage.getItem('user');
 if text
-    .chat.pure-u-1-2(class=!authenticated ? 'chat__chat-hide' : '')
-        span.chat__name= `${user}:`
+    .chat.pure-u-1-2
+        span.chat__name= user
         span.chat__message= text

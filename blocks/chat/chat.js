@@ -10,9 +10,9 @@ export class Chat {
 
     }
 
-    render(text = '') {
+    render(text = 'test', user = '') {
         this.el.innerHTML += template({
-            text
+            text, user
         });
     }
 
