@@ -2,9 +2,11 @@ import {Auth, defaultLogin} from './auth/auth';
 import {Chat} from './chat/chat';
 import {Message} from './message/message';
 import {request} from '../modules/utils';
+import {Hello} from './test.jsx';
+
 
 window.addEventListener('DOMContentLoaded', () => {
-    console.log(Auth);
+    Hello.create(document.querySelector('.js-hello'));
 
     let auth = new Auth(document.querySelector('.js-auth'), {});
     let chat = new Chat(document.querySelector('.js-chat'), {});
